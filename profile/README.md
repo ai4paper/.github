@@ -17,7 +17,7 @@ flowchart LR
     end
 
     subgraph Authoring [Authoring Layer]
-        PLUGIN[apaper-plugin<br/>Claude Code plugin]
+        PLUGIN[apaper-plugin<br/>AI coding agent toolkit]
     end
 
     subgraph Guidance [Lifecycle Guide]
@@ -34,12 +34,14 @@ flowchart LR
 | Repository | Stack | What it does |
 | ---------- | ----- | ------------ |
 | [**apaper-mcp**](https://github.com/ai4paper/apaper-mcp) | Bun · TypeScript | MCP server for paper research — searches IACR, DBLP, and Google Scholar; collects BibTeX entries; downloads IACR PDFs. Published as [`@ai4paper/apaper-mcp`](https://www.npmjs.com/package/@ai4paper/apaper-mcp). |
-| [**apaper-plugin**](https://github.com/ai4paper/apaper-plugin) | Python · Claude Code | A Claude Code plugin that bundles three skills — `ieee-journal-writing`, `creating-figures` (TikZ), and `pdf` — with the `apaper-mcp` server, so one install gives Claude Code everything it needs to research, draft IEEE prose, render figures, and process PDFs. |
+| [**apaper-plugin**](https://github.com/ai4paper/apaper-plugin) | Claude Code · Codex · OpenCode | An academic paper-authoring toolkit for AI coding agents. It bundles `writing` and `creating-figures` skills with the `apaper-mcp` server for literature research, IEEE-style prose, and publication-quality figures. |
 | [**book**](https://github.com/ai4paper/book) | Typst | A practical guide to using AI4Paper throughout the full AI/ML paper lifecycle: foundations, setup, problem selection, experiments, data and figures, writing, submission, revision, and post-acceptance work. |
 
 #### How they compose
 
-- **In Claude Code (terminal/IDE):** install [`apaper-plugin`](https://github.com/ai4paper/apaper-plugin) via `/plugin marketplace add ai4paper/apaper-plugin`. The plugin auto-wires [`apaper-mcp`](https://github.com/ai4paper/apaper-mcp) and registers the writing / figure / PDF skills.
+- **Claude Code:** add the marketplace with `/plugin marketplace add ai4paper/apaper-plugin`, then run `/plugin install apaper-plugin@apaper`. The plugin registers both skills and [`apaper-mcp`](https://github.com/ai4paper/apaper-mcp) automatically.
+- **OpenCode:** install the toolkit through its [OCX registry](https://ai4paper.github.io/apaper-plugin) with `ocx registry add https://ai4paper.github.io/apaper-plugin --name apaper`, then `ocx add apaper/apaper`.
+- **Codex:** install the skills with `npx skills add ai4paper/apaper-plugin -a codex`, then register the MCP server with `codex mcp add apaper-mcp -- npx -y @ai4paper/apaper-mcp`.
 - **Across the paper lifecycle:** follow the [`book`](https://github.com/ai4paper/book) for practical guidance from setting up a project and finding a research problem through experiments, writing, submission, revision, and post-acceptance work.
 - **Bring-your-own client:** point any MCP-compatible client at [`apaper-mcp`](https://github.com/ai4paper/apaper-mcp) directly for just the research tools.
 
