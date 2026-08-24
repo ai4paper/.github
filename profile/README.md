@@ -1,55 +1,78 @@
-## AI4Paper — Tools for AI-Assisted Academic Paper Writing
+## AI4Paper — An AI Workspace for Academic Paper Writing
 
 ### Vision
 
-AI4Paper builds open-source tools and practical guidance that help researchers move from a topic to a finished paper with AI assistance — from literature search and experiments to drafting, figures, submission, and revision.
+AI4Paper is building an open-source workspace that helps researchers complete the entire paper-writing workflow with AI: discovering and reviewing literature, planning experiments, drafting and revising text, creating figures, managing references, and preparing a paper for submission.
+
+[`ipaper`](https://github.com/ai4paper/ipaper) is the user-facing workspace. Built on DSH Web, it brings the AI agent, paper-authoring skills, and research tools together in one interface.
 
 ---
 
-### Repositories
+### Architecture
 
-Together, these repositories provide tools and guidance for the full research-paper lifecycle.
+The repositories form a layered system rather than a collection of separate tools:
 
 ```mermaid
 flowchart LR
-    subgraph Research [Research Layer]
-        MCP[apaper-mcp<br/>MCP server]
+    USER((Researcher)) --> IPAPER
+
+    subgraph UI [Paper-Writing Workspace]
+        IPAPER[ipaper<br/>User interface based on DSH Web]
     end
 
-    subgraph Authoring [Authoring Layer]
-        PLUGIN[apaper-plugin<br/>AI coding agent toolkit]
+    subgraph AGENT [DeepSeek Harness]
+        DSH[DSH agent runtime]
+        PLUGIN[apaper-plugin<br/>Native DSH plugin]
+        SKILLS[Writing and figure skills]
+        DSH -->|loads| PLUGIN
+        PLUGIN --> SKILLS
     end
 
-    subgraph Guidance [Lifecycle Guide]
-        BOOK[book<br/>Practical guide]
+    subgraph RESEARCH [Research Services]
+        MCP[apaper-mcp<br/>Python MCP server]
+        SOURCES[(Academic paper sources)]
+        MCP --> SOURCES
     end
 
-    MCP --> PLUGIN
-    PLUGIN -->|skills| Author((Author))
-    BOOK -->|guides| Author
-    BOOK -.-> MCP
-    BOOK -.-> PLUGIN
+    IPAPER --> DSH
+    PLUGIN -->|research tools| MCP
+
+    BOOK[book<br/>Paper-writing guide]
+    BOOK -.->|workflow guidance| USER
+    BOOK -.->|best practices| AGENT
 ```
 
-| Repository | Stack | What it does |
-| ---------- | ----- | ------------ |
-| [**apaper-mcp**](https://github.com/ai4paper/apaper-mcp) | Bun · TypeScript | MCP server for paper research — searches IACR, DBLP, and Google Scholar; collects BibTeX entries; downloads IACR PDFs. Published as [`@ai4paper/apaper-mcp`](https://www.npmjs.com/package/@ai4paper/apaper-mcp). |
-| [**apaper-plugin**](https://github.com/ai4paper/apaper-plugin) | Claude Code · Codex · OpenCode | An academic paper-authoring toolkit for AI coding agents. It bundles `writing` and `creating-figures` skills with the `apaper-mcp` server for literature research, IEEE-style prose, and publication-quality figures. |
-| [**book**](https://github.com/ai4paper/book) | Typst | A practical guide to using AI4Paper throughout the full AI/ML paper lifecycle: foundations, setup, problem selection, experiments, data and figures, writing, submission, revision, and post-acceptance work. |
+- **`ipaper` is the workspace:** the interface where researchers coordinate and finish paper-writing jobs from literature review through submission.
+- **`apaper-plugin` is the agent capability layer:** a native DSH plugin that equips the agent with academic writing, figure creation, and paper-research capabilities.
+- **`apaper-mcp` is the research service:** a Python MCP server that searches academic sources, retrieves metadata and BibTeX, and downloads papers.
+- **`book` is the workflow guide:** practical guidance and best practices for the complete AI-assisted paper lifecycle.
 
-#### How they compose
+### Repositories
 
-- **Claude Code:** add the marketplace with `/plugin marketplace add ai4paper/apaper-plugin`, then run `/plugin install apaper-plugin@apaper`. The plugin registers both skills and [`apaper-mcp`](https://github.com/ai4paper/apaper-mcp) automatically.
-- **OpenCode:** install the toolkit through its [OCX registry](https://ai4paper.github.io/apaper-plugin) with `ocx registry add https://ai4paper.github.io/apaper-plugin --name apaper`, then `ocx add apaper/apaper`.
-- **Codex:** install the skills with `npx skills add ai4paper/apaper-plugin -a codex`, then register the MCP server with `codex mcp add apaper-mcp -- npx -y @ai4paper/apaper-mcp`.
-- **Across the paper lifecycle:** follow the [`book`](https://github.com/ai4paper/book) for practical guidance from setting up a project and finding a research problem through experiments, writing, submission, revision, and post-acceptance work.
-- **Bring-your-own client:** point any MCP-compatible client at [`apaper-mcp`](https://github.com/ai4paper/apaper-mcp) directly for just the research tools.
+| Repository | Stack | Role |
+| ---------- | ----- | ---- |
+| [**ipaper**](https://github.com/ai4paper/ipaper) | DSH Web · TypeScript | The user interface for the complete paper-writing workflow. It is being redeveloped on top of DSH Web to provide an integrated workspace for research, writing, figures, references, and other paper-related jobs. |
+| [**apaper-plugin**](https://github.com/ai4paper/apaper-plugin) | DeepSeek Harness · Cordis | A native DSH plugin for academic paper authoring. It adds writing and publication-quality figure skills and connects the agent to `apaper-mcp` research tools. |
+| [**apaper-mcp**](https://github.com/ai4paper/apaper-mcp) | Python 3.12+ · uv | A Python MCP server for academic research. It searches arXiv, IACR ePrint, DBLP, Google Scholar, and CNKI; retrieves metadata and BibTeX; and downloads supported PDFs. |
+| [**book**](https://github.com/ai4paper/book) | Typst | A practical guide to the full AI/ML paper lifecycle: setup, problem selection, experiments, data and figures, writing, submission, revision, and post-acceptance work. |
+
+#### How they work together
+
+1. A researcher works in **`ipaper`**, the DSH Web-based paper-writing interface.
+2. The DSH agent loads **`apaper-plugin`** to gain specialized writing and figure-generation skills.
+3. The plugin uses **`apaper-mcp`** when the agent needs to search the literature, collect citations, or download papers.
+4. The **`book`** provides workflow guidance and best practices throughout the process.
+
+For direct use outside `ipaper`:
+
+- Install the plugin in a DeepSeek Harness profile with `dsh plugin --profile web add @ai4paper/apaper-plugin`.
+- Run the Python MCP server with `uvx apaper-mcp`, or connect any MCP-compatible client to it as a local stdio server.
 
 ---
 
 ### Contributing
 
-We welcome contributions across all repos. Open an issue or PR on the relevant repository.
+We welcome contributions across all repositories. Open an issue or pull request in the project most closely related to your change.
 
 ### License
 
