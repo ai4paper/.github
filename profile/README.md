@@ -4,7 +4,7 @@
 
 AI4Paper is building an open-source workspace that helps researchers complete the entire paper-writing workflow with AI: discovering and reviewing literature, planning experiments, drafting and revising text, creating figures, managing references, and preparing a paper for submission.
 
-[`ipaper`](https://github.com/ai4paper/ipaper) is the user-facing workspace. Built on DSH Web, it brings the AI agent, paper-authoring skills, and research tools together in one interface.
+AI4Paper now uses [OpenCode](https://opencode.ai) as its backend agent runtime, with [`apaper-plugin`](https://github.com/ai4paper/apaper-plugin) providing paper-authoring capabilities and [`apaper-mcp`](https://github.com/ai4paper/apaper-mcp) providing research tools. DSH is no longer the runtime, and development of the former [`ipaper`](https://github.com/ai4paper/ipaper) workspace has stopped.
 
 ---
 
@@ -14,17 +14,13 @@ The repositories form a layered system rather than a collection of separate tool
 
 ```mermaid
 flowchart LR
-    USER((Researcher)) --> IPAPER
+    USER((Researcher)) --> OPENCODE
 
-    subgraph UI [Paper-Writing Workspace]
-        IPAPER[ipaper<br/>User interface based on DSH Web]
-    end
-
-    subgraph AGENT [DeepSeek Harness]
-        DSH[DSH agent runtime]
-        PLUGIN[apaper-plugin<br/>Native DSH plugin]
+    subgraph AGENT [Agent Runtime and Capabilities]
+        OPENCODE[OpenCode<br/>Backend agent runtime]
+        PLUGIN[apaper-plugin<br/>Paper-authoring capabilities for OpenCode]
         SKILLS[Writing and figure skills]
-        DSH -->|loads| PLUGIN
+        OPENCODE -->|loads| PLUGIN
         PLUGIN --> SKILLS
     end
 
@@ -34,7 +30,6 @@ flowchart LR
         MCP --> SOURCES
     end
 
-    IPAPER --> DSH
     PLUGIN -->|research tools| MCP
 
     BOOK[book<br/>Paper-writing guide]
@@ -42,8 +37,8 @@ flowchart LR
     BOOK -.->|best practices| AGENT
 ```
 
-- **`ipaper` is the workspace:** the interface where researchers coordinate and finish paper-writing jobs from literature review through submission.
-- **`apaper-plugin` is the agent capability layer:** a native DSH plugin that equips the agent with academic writing, figure creation, and paper-research capabilities.
+- **OpenCode is the backend agent runtime:** it runs the agent that coordinates paper-writing tasks and uses specialized skills and research tools.
+- **`apaper-plugin` is the agent capability layer:** it targets OpenCode and equips the agent with academic writing, figure creation, and paper-research capabilities.
 - **`apaper-mcp` is the research service:** a Python MCP server that searches academic sources, retrieves metadata and BibTeX, and downloads papers.
 - **`book` is the workflow guide:** practical guidance and best practices for the complete AI-assisted paper lifecycle.
 
@@ -51,21 +46,21 @@ flowchart LR
 
 | Repository | Stack | Role |
 | ---------- | ----- | ---- |
-| [**ipaper**](https://github.com/ai4paper/ipaper) | DSH Web · TypeScript | The user interface for the complete paper-writing workflow. It is being redeveloped on top of DSH Web to provide an integrated workspace for research, writing, figures, references, and other paper-related jobs. |
-| [**apaper-plugin**](https://github.com/ai4paper/apaper-plugin) | DeepSeek Harness · Cordis | A native DSH plugin for academic paper authoring. It adds writing and publication-quality figure skills and connects the agent to `apaper-mcp` research tools. |
+| [**apaper-plugin**](https://github.com/ai4paper/apaper-plugin) | OpenCode | The academic paper-authoring capability layer for the OpenCode agent runtime. It adds writing and publication-quality figure skills and connects the agent to `apaper-mcp` research tools. |
 | [**apaper-mcp**](https://github.com/ai4paper/apaper-mcp) | Python 3.12+ · uv | A Python MCP server for academic research. It searches arXiv, IACR ePrint, DBLP, Google Scholar, and CNKI; retrieves metadata and BibTeX; and downloads supported PDFs. |
 | [**book**](https://github.com/ai4paper/book) | Typst | A practical guide to the full AI/ML paper lifecycle: setup, problem selection, experiments, data and figures, writing, submission, revision, and post-acceptance work. |
+| [**ipaper**](https://github.com/ai4paper/ipaper) | Legacy workspace | The former user-facing workspace. Development has stopped; it is not part of the current architecture. |
 
 #### How they work together
 
-1. A researcher works in **`ipaper`**, the DSH Web-based paper-writing interface.
-2. The DSH agent loads **`apaper-plugin`** to gain specialized writing and figure-generation skills.
+1. A researcher uses **OpenCode** as the agent runtime for paper-writing tasks.
+2. OpenCode loads **`apaper-plugin`** to gain specialized writing and figure-generation skills.
 3. The plugin uses **`apaper-mcp`** when the agent needs to search the literature, collect citations, or download papers.
 4. The **`book`** provides workflow guidance and best practices throughout the process.
 
-For direct use outside `ipaper`:
+For setup and direct use:
 
-- Install the plugin in a DeepSeek Harness profile with `dsh plugin --profile web add @ai4paper/apaper-plugin`.
+- Follow the [`apaper-plugin` README](https://github.com/ai4paper/apaper-plugin#readme) for OpenCode setup instructions.
 - Run the Python MCP server with `uvx apaper-mcp`, or connect any MCP-compatible client to it as a local stdio server.
 
 ---
